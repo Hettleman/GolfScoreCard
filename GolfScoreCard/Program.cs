@@ -12,7 +12,7 @@ class Program
         using (HttpClient client = new HttpClient())
         {
             string baseUrl = "https://api.golfcourseapi.com/v1/search";
-            string apiKey = "3YAAYTTX6EJRBN735FGSEM4GVM";  // Replace with your actual API key
+            string apiKey = "3YAAYTTX6EJRBN735FGSEM4GVM";
             
             Console.WriteLine("Ex: oxmoor ridge, Lubbock Country Club, Pebble Beach");
             Console.WriteLine("Enter a golf course name: ");
@@ -30,13 +30,9 @@ class Program
                     string responseBody = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-                    // Always print where files will be saved
-                    Console.WriteLine("Current Directory: " + Environment.CurrentDirectory);
-
                     // Force save raw API response for debugging
                     string rawPath = "/Users/rayhettleman/RiderProjects/GolfScoreCard/GolfScoreCard/CourseDataOutput.json";
                     await File.WriteAllTextAsync(rawPath, responseBody);
-                    Console.WriteLine($"Raw API response saved to: {rawPath}");
 
                     // Try deserializing
                     CourseResponse courseData = JsonSerializer.Deserialize<CourseResponse>(responseBody, options);

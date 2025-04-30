@@ -1,64 +1,25 @@
-﻿namespace GolfScoreCard;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.IO;
+﻿var builder = WebApplication.CreateBuilder(args);
 
-class Program
+// Add services to the container.
+builder.Services.AddRazorPages();
+builder.Services.AddHttpClient(); // Needed for API calls
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    static async Task Main(string[] args)
-    {
-        using (HttpClient client = new HttpClient())
-        {
-            string baseUrl = "https://api.golfcourseapi.com/v1/search";
-            string apiKey = "3YAAYTTX6EJRBN735FGSEM4GVM";
-            
-            Console.WriteLine("Ex: oxmoor ridge, Lubbock Country Club, Pebble Beach");
-            Console.WriteLine("Enter a golf course name: ");
-            string searchQuery = Console.ReadLine();
-            
-            string requestUrl = $"{baseUrl}?search_query={Uri.EscapeDataString(searchQuery)}";
-            client.DefaultRequestHeaders.Add("Authorization", $"Key {apiKey}");
-
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync(requestUrl);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseBody = await response.Content.ReadAsStringAsync();
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-                    // Force save raw API response for debugging
-                    string rawPath = "/Users/rayhettleman/RiderProjects/GolfScoreCard/GolfScoreCard/CourseDataOutput.json";
-                    await File.WriteAllTextAsync(rawPath, responseBody);
-
-                    // Try deserializing
-                    CourseResponse courseData = JsonSerializer.Deserialize<CourseResponse>(responseBody, options);
-
-                    if (courseData != null)
-                    {
-                        Console.WriteLine("State:");
-                        Console.WriteLine(courseData.courses[0].location.state);
-                        Console.WriteLine("Par:");
-                        Console.WriteLine(courseData.courses[0].tees.female[0].par_total);
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("Deserialization failed — check TestRawOutput.json for raw data.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine($"Error: {(int)response.StatusCode} - {response.ReasonPhrase}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Request failed: {ex.Message}");
-            }
-        }
-    }
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapRazorPages();
+
+app.Run();

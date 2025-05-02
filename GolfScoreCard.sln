@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfScoreCard", "GolfScoreCard\GolfScoreCard.csproj", "{1719187F-9946-4610-851C-5F30F69D608C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API Testing", "API Testing\API Testing.csproj", "{81F10812-C041-4A00-A423-8AFD2A6DAE0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{1719187F-9946-4610-851C-5F30F69D608C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1719187F-9946-4610-851C-5F30F69D608C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1719187F-9946-4610-851C-5F30F69D608C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

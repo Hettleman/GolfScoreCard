@@ -1,0 +1,113 @@
+/* Hero section with background image */
+.hero {
+    background-image: url('/images/as-smallgreens1.jpg');
+
+    background-position: center;
+    height: 100vh;
+    color: white;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2); /* white cast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Top nav */
+.hero-nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    color: #222;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+.hero-nav .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.hero-nav .nav-links a {
+    margin-left: 2rem;
+    color: #2e7d32;
+    text-decoration: none;
+}
+
+/* Hero text content */
+.hero-content {
+    text-align: center;
+    margin: auto;
+    max-width: 800px;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    line-height: 1.2;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin: 1.5rem 0;
+}
+
+.search-wrapper {
+    position: relative;
+    max-width: 400px;
+    margin: 2rem auto;
+    z-index: 100;
+}
+
+#courseSearch {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 40px;
+    border: none;
+    outline: none;
+}
+
+.dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.dropdown-list div {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+}
+
+.dropdown-list div:hover {
+    background-color: #f1f3f4;
+}
+
+

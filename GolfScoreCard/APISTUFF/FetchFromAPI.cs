@@ -37,9 +37,9 @@ public class FetchFromAPI
                 Console.WriteLine($"{courseSelection} saved to: {path}");
 
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                Course? courseData = JsonSerializer.Deserialize<Course>(responseBody, options);
+                var courseData = JsonSerializer.Deserialize<CourseResponse>(responseBody, options);
 
-                if (courseData != null)
+                if (courseData?.courses?.Count > 0)
                 {
                     Console.WriteLine("State:");
                     Console.WriteLine(GetLocation(courseData));
@@ -59,13 +59,13 @@ public class FetchFromAPI
         }
     }
     
-    public static string GetLocation(Course courseData)
+    public static string GetLocation(CourseResponse courseData)
     {
-        return courseData.location.state;
+        return courseData.courses[0].location.state;
     }
     
-    public static int GetFemalePar(Course courseData)
+    public static int GetFemalePar(CourseResponse courseData)
     {
-        return courseData.tees.female[0].par_total;
+        return courseData.courses[0].tees.female[0].par_total;
     }
 }

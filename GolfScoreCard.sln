@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GolfScoreCard", "GolfScoreC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API Testing", "API Testing\API Testing.csproj", "{81F10812-C041-4A00-A423-8AFD2A6DAE0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendTesting", "BackendTesting\BackendTesting.csproj", "{317B9BE6-DFAE-4E29-8A29-D0680DCBF589}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81F10812-C041-4A00-A423-8AFD2A6DAE0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{317B9BE6-DFAE-4E29-8A29-D0680DCBF589}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317B9BE6-DFAE-4E29-8A29-D0680DCBF589}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317B9BE6-DFAE-4E29-8A29-D0680DCBF589}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317B9BE6-DFAE-4E29-8A29-D0680DCBF589}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

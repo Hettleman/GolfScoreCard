@@ -9,7 +9,6 @@ namespace GolfScoreCard
         public static double HandicapCalc(List<double> scores, List<double> slopes, List<double> ratings)
         {
             double handicap;
-            //Calculate for par 72 course
             var topEight = new List<double>();
             for (int i = 0; i < scores.Count; i++)
             {
@@ -24,12 +23,7 @@ namespace GolfScoreCard
                 {
                     if (thisDifferential < topEight[7])
                     {
-                        int insertIdx = topEight.BinarySearch(thisDifferential);
-                        if (insertIdx < 0) 
-                            insertIdx = ~insertIdx;      // ~ gives the bitwise complement → correct insertion point
-                
-                        topEight.Insert(insertIdx, thisDifferential);
-                        topEight.RemoveAt(8);
+                        InsertDifferential(topEight, thisDifferential);
                     }
                 }
             }
@@ -45,7 +39,18 @@ namespace GolfScoreCard
             return 0; 
         }
 
-    private static double CalculateDifferential(double score, double slope, double rating)
+        public static List<double> InsertDifferential(List<double> topEight, double thisDifferential)
+        {
+            int insertIdx = topEight.BinarySearch(thisDifferential);
+            if (insertIdx < 0) 
+                insertIdx = ~insertIdx;      // ~ gives the bitwise complement → correct insertion point
+                
+            topEight.Insert(insertIdx, thisDifferential);
+            topEight.RemoveAt(8);
+            return topEight;
+        }
+
+        public static double CalculateDifferential(double score, double slope, double rating)
     {
         double differential;
         differential = ((score - rating) * (113 / slope));

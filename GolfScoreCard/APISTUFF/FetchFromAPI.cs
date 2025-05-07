@@ -1,68 +1,25 @@
-﻿namespace GolfScoreCard;
-
-using System;
+﻿// APISTUFF/FetchFromAPI.cs
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Text.Json;
-using System.IO;
+using System.Threading.Tasks;
+
+namespace GolfScoreCard.APISTUFF;
 
 public class FetchFromAPI
 {
-    static async Task Fetch()
+    private readonly HttpClient _httpClient;
+
+    public FetchFromAPI(HttpClient httpClient)
     {
-        using var client = new HttpClient();
-        const string baseUrl = "https://api.golfcourseapi.com/v1/search";
-        const string apiKey  = "3YAAYTTX6EJRBN735FGSEM4GVM";
-
-        Console.Write("Enter a golf course name: ");
-        var courseSelection = Console.ReadLine();
-
-        var requestUrl = $"{baseUrl}?search_query={Uri.EscapeDataString(courseSelection)}";
-        client.DefaultRequestHeaders.Add("Authorization", $"Key {apiKey}");
-
-        try
-        {
-            var response = await client.GetAsync(requestUrl);
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var path = "/path/to/CourseDataOutput.json";
-            await File.WriteAllTextAsync(path, responseBody);
-            Console.WriteLine($"{courseSelection} saved to: {path}");
-
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            var courseData = JsonSerializer.Deserialize<CourseResponse>(responseBody, options);
-
-            if (courseData?.courses?.Count > 0)
-            {
-                var firstCourse = courseData.courses[0];
-
-                Console.WriteLine("State:");
-                Console.WriteLine(GetLocation(firstCourse));
-
-                Console.WriteLine("Par:");
-                Console.WriteLine(GetFemalePar(firstCourse));
-            }
-            else
-            {
-                Console.WriteLine("No course data returned.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Request failed: {ex.Message}");
-        }
+        _httpClient = httpClient;
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Key 3YAAYTTX6EJRBN735FGSEM4GVM");
     }
-    
-    // now takes a Course
-    public static string GetLocation(Course course)
+
+    public async Task<string> SearchCoursesAsync(string query)
     {
-        return course.location.state;
-    }
-    
-    // now takes a Course
-    public static int GetFemalePar(Course course)
-    {
-        return course.tees.female[0].par_total;
+        var url = $"https://api.golfcourseapi.com/v1/search?search_query={Uri.EscapeDataString(query)}";
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
     }
 }

@@ -14,9 +14,18 @@ ViewData["Title"] = "Home";
     <script>
     const input = document.getElementById("courseSearch");
     const dropdown = document.getElementById("dropdown");
+    let debounceTimer;
 
-    input.addEventListener("input", async () => {
-        const query = input.value.trim();
+    input.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(() => {
+            fetchSuggestions(input.value.trim());
+        }, 300);
+    });
+    
+    
+    async function fetchSuggestions(query) {
         dropdown.innerHTML = "";
 
         if (query.length < 2) {
@@ -24,16 +33,24 @@ ViewData["Title"] = "Home";
             return;
         }
 
+        
+        const loadingDiv = document.createElement("div");
+        loadingDiv.textContent = "Searching...";
+        loadingDiv.style.color = "#666"; // subtle color
+        dropdown.appendChild(loadingDiv);
+        dropdown.style.display = "block";
+
         try {
             const res = await fetch(`/api/golfcourses?query=${encodeURIComponent(query)}`);
             const data = await res.json();
-
-            // ✅ ADD THIS LINE RIGHT HERE
-            console.log("API response:", data);
-
             const courses = data?.courses || [];
+
+            dropdown.innerHTML = ""; // clear "Searching..."
+
             if (courses.length === 0) {
-                dropdown.style.display = "none";
+                const noResultsDiv = document.createElement("div");
+                noResultsDiv.textContent = "No results found.";
+                dropdown.appendChild(noResultsDiv);
                 return;
             }
 
@@ -41,18 +58,26 @@ ViewData["Title"] = "Home";
                 const div = document.createElement("div");
                 div.textContent = `${course.club_name} – ${course.course_name}`;
                 div.onclick = () => {
-                    input.value = course.name;
+                    input.value = course.course_name;
                     dropdown.innerHTML = "";
                     dropdown.style.display = "none";
+                    window.location.href = `/CourseInfo?id=${course.id}`;
                 };
                 dropdown.appendChild(div);
             });
+            
+            
 
-            dropdown.style.display = "block";
+
         } catch (err) {
-            console.error("Error fetching API data:", err);
+            dropdown.innerHTML = "<div style='color: red;'>Error loading courses</div>";
+            console.error("Fetch error:", err);
         }
-    });
+}
+
+
+
+
 
     document.addEventListener("click", (e) => {
         if (!document.querySelector(".search-wrapper").contains(e.target)) {

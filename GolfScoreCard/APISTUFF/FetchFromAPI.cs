@@ -22,4 +22,13 @@ public class FetchFromAPI
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
+    
+    public async Task<string> GetCourseByIdAsync(int courseId)
+    {
+        var url = $"https://api.golfcourseapi.com/v1/courses/{courseId}"; // adjust based on API docs
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsStringAsync();
+    }
+
 }

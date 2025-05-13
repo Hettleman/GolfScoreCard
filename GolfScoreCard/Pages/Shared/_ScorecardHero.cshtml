@@ -1,0 +1,53 @@
+@* Scorecard Hero: background + nav + grey card *@
+<section class="hero">
+    <nav class="hero-nav">
+        <div class="logo">ParPal</div>
+        <div class="nav-links">
+            <a href="/Login">Login</a>
+            <a href="/Register">Create Account</a>
+        </div>
+    </nav>
+
+    <div class="hero-overlay"></div>
+
+    <div class="scorecard-container">
+        <div class="scorecard-card">
+            <table class="scorecard-table">
+                <thead>
+                <tr>
+                    <th>Hole</th>
+                    @for (int i = 1; i <= 9; i++) { <th>@i</th> }
+                    <th>Out</th>
+                    @for (int i = 10; i <= 18; i++) { <th>@i</th> }
+                    <th>In</th>
+                    <th>Tot</th>
+                    <th>+/-</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th>Distance</th>
+                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Distance[@i]" /></td> }
+                    <td></td>
+                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Distance[@i]" /></td> }
+                    <td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <th>Par</th>
+                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Par[@i]" /></td> }
+                    <td></td>
+                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Par[@i]" /></td> }
+                    <td></td><td></td><td></td>
+                </tr>
+                <tr>
+                    <th>Player 1</th>
+                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Score1[@i]" /></td> }
+                    <td></td>
+                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Score1[@i]" /></td> }
+                    <td></td><td></td><td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

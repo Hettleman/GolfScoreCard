@@ -1,3 +1,4 @@
+@* Existing hero markup *@
 <section class="hero">
     <nav class="hero-nav">
         <div class="logo">ParPal</div>
@@ -15,10 +16,21 @@
                 keep a record of your rounds, and view your handicap.
             </p>
 
-            <!-- SEARCH BAR + DROPDOWN -->
+            <!-- SEARCH BAR -->
             <div class="search-wrapper">
-                <input type="text" id="courseSearch" placeholder="Search a golf course..." autocomplete="off" />
+                <input
+                    type="text"
+                    id="courseSearch"
+                    placeholder="Search a golf course..."
+                />
                 <div id="dropdown" class="dropdown-list"></div>
+            </div>
+
+            <!-- NEW BUTTON CTA -->
+            <div class="hero-cta">
+                <a href="/scorecard" class="btn btn-primary">
+                    Enter Your Round
+                </a>
             </div>
         </div>
     </div>

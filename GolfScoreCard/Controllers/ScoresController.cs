@@ -53,10 +53,10 @@ namespace GolfScoreCard.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetScores([FromQuery] string userId)
+        public async Task<IActionResult> GetScores([FromQuery] string username)
         {
             var scores = await _context.Scores
-                .Where(s => s.username == userId)
+                .Where(s => s.username == username)
                 .ToListAsync();
 
             return Ok(scores);

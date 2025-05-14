@@ -51,5 +51,15 @@ namespace GolfScoreCard.Controllers
 
             return Ok("Score deleted successfully.");
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetScores([FromQuery] string userId)
+        {
+            var scores = await _context.Scores
+                .Where(s => s.username == userId)
+                .ToListAsync();
+
+            return Ok(scores);
+        }
     }
 }

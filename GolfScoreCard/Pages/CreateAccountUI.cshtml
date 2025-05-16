@@ -1,0 +1,29 @@
+@page
+@model GolfScoreCard.Pages.CreateAccountUI
+@{
+ViewData["Title"] = "Create Account";
+}
+
+<section class="hero">
+    <nav class="hero-nav">
+        <div class="logo">
+            <a href="/" class="nav-logo">ParPal</a>
+        </div>
+        <div class="nav-links">
+            <a href="/LoginUI">Login</a>
+            <a href="/CreateAccountUI">Create Account</a>
+        </div>
+    </nav>
+
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <h1>Create Your Account</h1>
+            <form method="post" class="auth-form">
+                <input type="text" name="username" placeholder="Username" required />
+                <input type="email" name="email" placeholder="Email" required />
+                <input type="password" name="password" placeholder="Password" required />
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+    </div>
+</section>

@@ -1,10 +1,22 @@
-namespace GolfScoreCard;
+using System.Text.Json.Serialization;
 
-public class Course
+namespace GolfScoreCard.APISTUFF
 {
-    public int id { get; set; }
-    public string club_name { get; set; }
-    public string course_name { get; set; }
-    public Location location { get; set; }
-    public Tees tees { get; set; } 
+    public class Course
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("club_name")]
+        public string ClubName { get; set; }
+
+        [JsonPropertyName("course_name")]
+        public string CourseName { get; set; }
+
+        [JsonPropertyName("location")]
+        public Location Location { get; set; }
+
+        [JsonPropertyName("tees")]
+        public Tees Tees { get; set; }
+    }
 }

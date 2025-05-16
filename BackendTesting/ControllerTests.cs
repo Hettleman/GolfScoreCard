@@ -31,7 +31,9 @@ public class ControllerTests
         var user = new User
         {
             username = "testuser",
-            passwordHash = "plaintextpassword"
+            passwordHash = "plaintextpassword",
+            sex = "Male",    // Added required field
+            handicap = 0     // Added required field
         };
 
         var result = await controller.CreateUser(user);
@@ -47,7 +49,9 @@ public class ControllerTests
         var user = new User
         {
             username = "ab",
-            passwordHash = "password123"
+            passwordHash = "password123",
+            sex = "Male",
+            handicap = 0   
         };
 
         var result = await controller.CreateUser(user);
@@ -63,7 +67,9 @@ public class ControllerTests
         var user = new User
         {
             username = "loginuser",
-            passwordHash = BCrypt.Net.BCrypt.HashPassword("correctpass")
+            passwordHash = BCrypt.Net.BCrypt.HashPassword("correctpass"),
+            sex = "Male",    
+            handicap = 0     
         };
         context.Users.Add(user);
         await context.SaveChangesAsync();
@@ -107,12 +113,17 @@ public class ControllerTests
         var result = await controller.AddScore(score);
         Assert.IsType<BadRequestObjectResult>(result);
     }
-
+    
     [Fact]
     public async Task AddScore_ShouldReturnOk_WhenValid()
     {
         var context = GetInMemoryDbContext();
-        context.Users.Add(new User { username = "player1", passwordHash = "hashed" });
+        context.Users.Add(new User { 
+            username = "player1", 
+            passwordHash = "hashed",
+            sex = "Male",  
+            handicap = 0     
+        });
         await context.SaveChangesAsync();
 
         var controller = new ScoresController(context);
@@ -143,7 +154,12 @@ public class ControllerTests
     public async Task GetScores_ShouldReturnUserScores()
     {
         var context = GetInMemoryDbContext();
-        context.Users.Add(new User { username = "playerX", passwordHash = "abc" });
+        context.Users.Add(new User { 
+            username = "playerX", 
+            passwordHash = "abc",
+            sex = "Male", 
+            handicap = 0  
+        });
         context.Scores.Add(new Score { username = "playerX", courseName = "Torrey Pines", userScore = 74, coursePar = 72 });
         await context.SaveChangesAsync();
 

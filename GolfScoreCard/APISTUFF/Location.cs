@@ -1,11 +1,25 @@
-namespace GolfScoreCard;
+using System.Text.Json.Serialization;
 
-public class Location
+namespace GolfScoreCard.APISTUFF
 {
-    public string address { get; set; }
-    public string city { get; set; }
-    public string state { get; set; }
-    public string country { get; set; }
-    public double latitude { get; set; }
-    public double longitude { get; set; }
+    public class Location
+    {
+        [JsonPropertyName("address")]
+        public string Address { get; set; }
+
+        [JsonPropertyName("city")]
+        public string City { get; set; }
+
+        [JsonPropertyName("state")]
+        public string State { get; set; }
+
+        [JsonPropertyName("country")]
+        public string Country { get; set; }
+
+        [JsonPropertyName("latitude")]
+        public double Latitude { get; set; }
+
+        [JsonPropertyName("longitude")]
+        public double Longitude { get; set; }
+    }
 }

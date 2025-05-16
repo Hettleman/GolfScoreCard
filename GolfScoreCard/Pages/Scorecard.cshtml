@@ -1,8 +1,17 @@
 @page
-@model GolfScoreCard.Pages.Shared.ScorecardModel
+@model GolfScoreCard.Pages.ScorecardModel
 @{
-    ViewData["Title"] = "Your Scorecard";
-    Layout = "_Layout";
+    ViewData["Title"] = "Scorecard";
 }
 
+@section Styles {
+    <!-- scorecard-specific CSS (you already have this in _Layout, so you can omit it here if you like) -->
+    <link rel="stylesheet" href="~/css/scorecard.css" />
+}
+
+<!-- RENDER THE HERO PARTIAL HERE -->
 @await Html.PartialAsync("_ScorecardHero")
+
+@section Scripts {
+    <!-- any page-specific JS -->
+}

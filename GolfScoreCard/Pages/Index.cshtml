@@ -1,93 +1,97 @@
 @page
 @model GolfScoreCard.Pages.IndexModel
 @{
-ViewData["Title"] = "Home";
+    ViewData["Title"] = "Home";
 }
 
 @section Styles {
-<link rel="stylesheet" href="/css/index.css" />
+    <link rel="stylesheet" href="/css/index.css" />
 }
 
 @await Html.PartialAsync("_PartialHero")
 ]
 @section Scripts {
     <script>
-    const input = document.getElementById("courseSearch");
-    const dropdown = document.getElementById("dropdown");
-    let debounceTimer;
+        const input = document.getElementById("courseSearch");
+        const dropdown = document.getElementById("dropdown");
+        let debounceTimer;
 
-    input.addEventListener("input", () => {
-        clearTimeout(debounceTimer);
+        input.addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchSuggestions(input.value.trim());
+            }, 300);
+        });
 
-        debounceTimer = setTimeout(() => {
-            fetchSuggestions(input.value.trim());
-        }, 300);
-    });
-    
-    
-    async function fetchSuggestions(query) {
-        dropdown.innerHTML = "";
+        async function fetchSuggestions(query) {
+            dropdown.innerHTML = "";
 
-        if (query.length < 2) {
-            dropdown.style.display = "none";
-            return;
-        }
-
-        
-        const loadingDiv = document.createElement("div");
-        loadingDiv.textContent = "Searching...";
-        loadingDiv.style.color = "#666"; // subtle color
-        dropdown.appendChild(loadingDiv);
-        dropdown.style.display = "block";
-
-        try {
-            const res = await fetch(`/api/golfcourses?query=${encodeURIComponent(query)}`);
-            const data = await res.json();
-            const courses = data?.courses || [];
-
-            dropdown.innerHTML = ""; // clear "Searching..."
-
-            if (courses.length === 0) {
-                const noResultsDiv = document.createElement("div");
-                noResultsDiv.textContent = "No results found.";
-                dropdown.appendChild(noResultsDiv);
+            if (query.length < 2) {
+                dropdown.style.display = "none";
                 return;
             }
 
-            courses.slice(0, 10).forEach(course => {
-                const div = document.createElement("div");
-                div.textContent = `${course.club_name} – ${course.course_name}`;
-                div.onclick = () => {
-                    input.value = course.course_name;
-                    dropdown.innerHTML = "";
-                    dropdown.style.display = "none";
-                    window.location.href = `/CourseInfo?id=${course.id}`;
-                };
-                dropdown.appendChild(div);
-            });
-            
-            
+            const loadingDiv = document.createElement("div");
+            loadingDiv.textContent = "Searching...";
+            loadingDiv.style.color = "#666"; // subtle color
+            dropdown.appendChild(loadingDiv);
+            dropdown.style.display = "block";
 
+            try {
+                // fetch full API response
+                const res      = await fetch(`/api/golfcourses?query=${encodeURIComponent(query)}`);
+                const fullData = await res.json();              // { courses: [ … ] }
+                const courses  = fullData.courses || [];
 
-        } catch (err) {
-            dropdown.innerHTML = "<div style='color: red;'>Error loading courses</div>";
-            console.error("Fetch error:", err);
+                dropdown.innerHTML = ""; // clear loading state
+
+                if (courses.length === 0) {
+                    const noResultsDiv = document.createElement("div");
+                    noResultsDiv.textContent = "No results found.";
+                    dropdown.appendChild(noResultsDiv);
+                    return;
+                }
+
+                // list up to 10 results
+                courses.slice(0, 10).forEach(course => {
+                    const div = document.createElement("div");
+                    div.textContent = `${course.club_name} – ${course.course_name}`;
+                    div.onclick = async () => {
+                        input.value = course.course_name;
+                        dropdown.innerHTML = "";
+                        dropdown.style.display = "none";
+
+                        // POST the entire API payload back to your server
+                        try {
+                            const saveRes = await fetch('/api/CourseDataOutput', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(fullData)
+                            });
+                            if (!saveRes.ok) throw new Error(await saveRes.text());
+                            console.log('✅ CourseDataOutput.json written');
+                        } catch (err) {
+                            console.error('❌ Error saving course data:', err);
+                        }
+
+                        // optionally navigate:
+                        // window.location.href = `/CourseInfo?id=${course.id}`;
+                    };
+                    dropdown.appendChild(div);
+                });
+
+            } catch (err) {
+                dropdown.innerHTML = "<div style='color: red;'>Error loading courses</div>";
+                console.error("Fetch error:", err);
+            }
         }
+
+        // click-away to close
+        document.addEventListener("click", (e) => {
+            if (!document.querySelector(".search-wrapper").contains(e.target)) {
+                dropdown.innerHTML = "";
+                dropdown.style.display = "none";
+            }
+        });
+    </script>
 }
-
-
-
-
-
-    document.addEventListener("click", (e) => {
-        if (!document.querySelector(".search-wrapper").contains(e.target)) {
-            dropdown.innerHTML = "";
-            dropdown.style.display = "none";
-        }
-    });
-</script>
-}
-
-
-
-

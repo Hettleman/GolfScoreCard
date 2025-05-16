@@ -1,4 +1,5 @@
-@* Scorecard Hero: background + nav + grey card *@
+@model GolfScoreCard.Pages.ScorecardModel
+
 <section class="hero">
     <nav class="hero-nav">
         <div class="logo">ParPal</div>
@@ -27,16 +28,16 @@
                 <tbody>
                 <tr>
                     <th>Distance</th>
-                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Distance[@i]" /></td> }
+                    @for (int i = 0; i < 9; i++) { <td>0</td> }
                     <td></td>
-                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Distance[@i]" /></td> }
+                    @for (int i = 9; i < 18; i++) { <td>0</td> }
                     <td></td><td></td><td></td>
                 </tr>
                 <tr>
                     <th>Par</th>
-                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Par[@i]" /></td> }
+                    @for (int i = 0; i < 9; i++) { <td>@Model.HolePars[i]</td> }
                     <td></td>
-                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Par[@i]" /></td> }
+                    @for (int i = 9; i < 18; i++) { <td>@Model.HolePars[i]</td> }
                     <td></td><td></td><td></td>
                 </tr>
                 <tr>

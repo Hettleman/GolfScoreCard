@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1) Register your controllers so /api/CourseDataOutput and friends will work
+builder.Services.AddControllers();
+
+// 2) Razor Pages + HttpClient + DbContext
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<FetchFromAPI>();
@@ -25,14 +29,21 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthorization();
+
+// ─── Note: no UseAuthorization() here ───
+
+// 3) Map attribute-based API controllers
+app.MapControllers();
+
+// 4) Map your Razor Pages
 app.MapRazorPages();
 
+// 5) Keep your minimal /api/golfcourses endpoint too
 app.MapGet("/api/golfcourses", async (string query, FetchFromAPI fetcher) =>
 {
     if (string.IsNullOrWhiteSpace(query))
         return Results.BadRequest("Missing query");
- 
+
     var json = await fetcher.SearchCoursesAsync(query);
     return Results.Content(json, "application/json");
 });

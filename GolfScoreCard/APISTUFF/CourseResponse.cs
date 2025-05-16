@@ -1,7 +1,11 @@
-namespace GolfScoreCard;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-public class CourseResponse
+namespace GolfScoreCard.APISTUFF
 {
-    public List<Course> courses { get; set; }
+    public class CourseResponse
+    {
+        [JsonPropertyName("courses")]
+        public List<Course> Courses { get; set; } = new();
+    }
 }

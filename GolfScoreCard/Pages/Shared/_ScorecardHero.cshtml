@@ -24,33 +24,94 @@
                     @for (int i = 10; i <= 18; i++) { <th>@i</th> }
                     <th>In</th>
                     <th>Tot</th>
-                    <th>+/-</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr>
                     <th>Distance</th>
-                    @for (int i = 0; i < 9; i++) { <td>0</td> }
+                    @for (int i = 0; i < 9; i++) { <td>@Model.HoleDistances[i]</td> }
                     <td></td>
-                    @for (int i = 9; i < 18; i++) { <td>0</td> }
-                    <td></td><td></td><td></td>
+                    @for (int i = 9; i < 18; i++) { <td>@Model.HoleDistances[i]</td> }
+                    <td></td>
+                    <td>
+                        @Model.HoleDistances.Take(18).Sum()
+                    </td>
                 </tr>
+
                 <tr>
                     <th>Par</th>
                     @for (int i = 0; i < 9; i++) { <td>@Model.HolePars[i]</td> }
-                    <td></td>
+                    <td>@Model.HolePars.Skip(9).Take(9).Sum()</td>
                     @for (int i = 9; i < 18; i++) { <td>@Model.HolePars[i]</td> }
-                    <td></td><td></td><td></td>
+                    <td>@Model.HolePars.Take(9).Sum()</td>
+                    <td>@Model.HolePars.Sum()</td>
                 </tr>
+
                 <tr>
                     <th>Player 1</th>
-                    @for (int i = 0; i < 9; i++) { <td><input type="text" name="Score1[@i]" /></td> }
-                    <td></td>
-                    @for (int i = 9; i < 18; i++) { <td><input type="text" name="Score1[@i]" /></td> }
-                    <td></td><td></td><td></td>
+
+                    @* Holes 1–9 *@
+                    @for (int i = 0; i < 9; i++)
+                    {
+                        <td>
+                            <input type="text"
+                                   name="Score1[@i]"
+                                   class="score1"
+                                   autocomplete="off" />
+                        </td>
+                    }
+
+                    @* Out sum (holes 1–9) *@
+                    <td id="player1_out"></td>
+
+                    @* Holes 10–18 *@
+                    @for (int i = 9; i < 18; i++)
+                    {
+                        <td>
+                            <input type="text"
+                                   name="Score1[@i]"
+                                   class="score1"
+                                   autocomplete="off" />
+                        </td>
+                    }
+
+                    @* In sum (holes 10–18) *@
+                    <td id="player1_in"></td>
+
+                    @* Total sum (all 18) *@
+                    <td id="player1_tot"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <div class="submit-score">
+        <a href="/Index" class="btn btn-primary">
+            Submit Score
+        </a>
+    </div>
 </section>
+
+<script>
+    // grab all of Player 1’s inputs
+    const inputs1 = Array.from(document.querySelectorAll('input.score1'));
+
+    function recalc1() {
+        const vals = inputs1.map(i => {
+            const n = parseInt(i.value, 10);
+            return isNaN(n) ? 0 : n;
+        });
+
+        const out = vals.slice(0, 9).reduce((a, b) => a + b, 0);
+        const inn = vals.slice(9).reduce((a, b) => a + b, 0);
+        const tot = out + inn;
+
+        document.getElementById('player1_out').textContent = out;
+        document.getElementById('player1_in').textContent  = inn;
+        document.getElementById('player1_tot').textContent = tot;
+    }
+
+    inputs1.forEach(i => i.addEventListener('input', recalc1));
+    recalc1();
+</script>

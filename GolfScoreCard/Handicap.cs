@@ -2,90 +2,105 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GolfScoreCard
+namespace Test
 {
-    public class Handicap
-    { 
-        public static double HandicapCalc(List<double> scores, List<double> slopes, List<double> ratings)
+    // 1. Strategy interface
+    public interface IHandicapStrategy
+    {
+        double ComputeHandicap(
+            List<double> scores,
+            List<double> slopes,
+            List<double> ratings
+        );
+    }
+
+    // 2. Excellence strategy (uses 0.96 factor)
+    public class ExcellenceHandicapStrategy : IHandicapStrategy
+    {
+        public double ComputeHandicap(List<double> scores, List<double> slopes, List<double> ratings)
         {
-            double handicap;
             var topEight = new List<double>();
+
             for (int i = 0; i < scores.Count; i++)
             {
-                double thisDifferential = CalculateDifferential(scores[i], slopes[i], ratings[i]);
+                var diff = CalculateDifferential(scores[i], slopes[i], ratings[i]);
 
                 if (topEight.Count < 8)
                 {
-                    topEight.Add(thisDifferential);
+                    topEight.Add(diff);
                     topEight.Sort();
                 }
-                else
+                else if (diff < topEight[7])
                 {
-                    if (thisDifferential < topEight[7])
-                    {
-                        InsertDifferential(topEight, thisDifferential);
-                    }
+                    InsertDifferential(topEight, diff);
                 }
             }
 
-            for (int i = 0; i < 8; i++)
+            // average the eight lowest differentials, then apply 0.96
+            return topEight.Average() * 0.96;
+        }
+
+        private static double CalculateDifferential(double score, double slope, double rating) =>
+            (score - rating) * (113.0 / slope);
+
+        private static void InsertDifferential(List<double> list, double diff)
+        {
+            int idx = list.BinarySearch(diff);
+            if (idx < 0) idx = ~idx;
+            list.Insert(idx, diff);
+            list.RemoveAt(8);
+        }
+    }
+
+    // 3. Basic strategy (no 0.96 factor)
+    public class BasicHandicapStrategy : IHandicapStrategy
+    {
+        public double ComputeHandicap(List<double> scores, List<double> slopes, List<double> ratings)
+        {
+            // compute all differentials
+            var diffs = scores
+                .Select((score, i) => CalculateDifferential(score, slopes[i], ratings[i]))
+                .ToList();
+
+            // sort ascending, take lowest 8
+            diffs.Sort();
+            var lowestEight = diffs.Take(8);
+
+            // simple average, no 0.96 factor
+            return lowestEight.Average();
+        }
+
+        private static double CalculateDifferential(double score, double slope, double rating) =>
+            (score - rating) * (113.0 / slope);
+    }
+
+    // 5. Application entry point
+    public static class Program
+    {
+        public static void Main()
+        {
+            var scores = new List<double>
             {
-                Console.WriteLine(topEight[i]);
-            }
+                72, 73, 73, 74, 74, 74, 75, 76, 77, 79,
+                80, 81, 81, 81, 82, 83, 83, 84, 85, 86
+            };
+            var slopes = new List<double>
+            {
+                113, 123, 119, 110, 134, 123, 112, 132, 133, 123,
+                142, 123, 130, 128, 120, 121, 114, 132, 154, 123
+            };
+            var ratings = new List<double>
+            {
+                72, 71, 72, 72, 71, 72, 73, 71, 71, 72,
+                70, 71, 72, 73, 72, 71, 71, 72, 72, 72
+            };
 
-            handicap = CalculateHandicap(topEight);
-            Console.WriteLine($"Your handicap based on your last 20 rounds: {handicap}");
+            var excellence = new ExcellenceHandicapStrategy();
+            double h1 = excellence.ComputeHandicap(scores, slopes, ratings); ;
 
-            return 0; 
+            var basic = new BasicHandicapStrategy();
+            double h2 = basic.ComputeHandicap(scores, slopes, ratings);
+
         }
-
-        public static List<double> InsertDifferential(List<double> topEight, double thisDifferential)
-        {
-            int insertIdx = topEight.BinarySearch(thisDifferential);
-            if (insertIdx < 0) 
-                insertIdx = ~insertIdx;      // ~ gives the bitwise complement → correct insertion point
-                
-            topEight.Insert(insertIdx, thisDifferential);
-            topEight.RemoveAt(8);
-            return topEight;
-        }
-
-        public static double CalculateDifferential(double score, double slope, double rating)
-    {
-        double differential;
-        differential = ((score - rating) * (113 / slope));
-        return differential;
     }
-
-    private static double CalculateHandicap(List<double> diffs)
-    {
-        double total = 0;
-        for (int i = 0; i < diffs.Count; i++)
-        {
-            total += diffs[i];
-        }
-
-        double handicap = ((total / 8) * .96);
-        return handicap;
-    }
-
-    public static void Main(string[] args)
-    {
-        // define your 20-round data
-        var scores = new List<double>
-        { 72, 73, 73, 74, 74, 74, 75, 76, 77, 79,
-            80, 81, 81, 81, 82, 83, 83, 84, 85, 86 };
-        var slopes = new List<double>
-        { 113, 123, 119, 110, 134, 123, 112, 132, 133, 123,
-            142, 123, 130, 128, 120, 121, 114, 132, 154, 123 };
-        var ratings = new List<double>
-        { 72, 71, 72, 72, 71, 72, 73, 71, 71, 72,
-            70, 71, 72, 73, 72, 71, 71, 72, 72, 72 };
-
-    
-        HandicapCalc(scores, slopes, ratings);
-    }
-    
-    }  
-
-}  
+}

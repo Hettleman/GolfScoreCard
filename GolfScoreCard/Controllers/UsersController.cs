@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 using GolfScoreCard; // for User
 using GolfScoreCard.Controllers; // adjust namespace if needed
+using GolfScoreCard.Observers;
 
 namespace GolfScoreCard.Controllers
 {
@@ -18,13 +19,20 @@ namespace GolfScoreCard.Controllers
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
             if (string.IsNullOrWhiteSpace(user.username)
-             || user.username.Length < 3
-             || user.username.Length > 30)
+                || user.username.Length < 3
+                || user.username.Length > 30)
                 return BadRequest("Username must be between 3 and 30 characters.");
 
             if (string.IsNullOrWhiteSpace(user.passwordHash)
-             || user.passwordHash.Length < 6)
+                || user.passwordHash.Length < 6)
                 return BadRequest("Password must be at least 6 characters.");
+
+            if (string.IsNullOrWhiteSpace(user.sex)
+                || (user.sex != "male" && user.sex != "female" && user.sex != "other"))
+                return BadRequest("Sex must be 'male', 'female', or 'other'.");
+
+            if (user.handicap < 0 || user.handicap > 54)
+                return BadRequest("Handicap must be between 0 and 54.");
 
             if (await _context.Users.AnyAsync(u => u.username == user.username))
                 return BadRequest("Username already exists.");
@@ -32,6 +40,7 @@ namespace GolfScoreCard.Controllers
             user.passwordHash = BCrypt.Net.BCrypt.HashPassword(user.passwordHash);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
             return Ok("User created successfully.");
         }
 
@@ -59,6 +68,35 @@ namespace GolfScoreCard.Controllers
                 return Unauthorized("Invalid username or password.");
 
             return Ok("Login successful.");
+        }
+        
+        [HttpPut("{username}/handicap")]
+        public async Task<IActionResult> UpdateHandicap(string username, [FromBody] decimal newHandicap)
+        {
+            // 1) Fetch
+            var user = await _context.Users.FindAsync(username);
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+
+            // 2) Store old, assign new
+            var oldHandicap = user.handicap;
+            user.handicap = newHandicap;
+
+            // 3) Persist
+            await _context.SaveChangesAsync();
+
+            // 4) Notify observer
+            var observer = new HandicapObserver();
+            observer.HandicapChange(user, oldHandicap, newHandicap);
+
+            // 5) Return
+            return Ok(new
+            {
+                username,
+                oldHandicap,
+                newHandicap,
+                message = "Handicap updated successfully."
+            });
         }
     }
 

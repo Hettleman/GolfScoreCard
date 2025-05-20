@@ -6,8 +6,16 @@
             <a href="/" class="nav-logo">ParPal</a>
         </div>
         <div class="nav-links">
+            @if (Context.Session.GetString("username") != null)
+            {
+            <span class="nav-username">@Context.Session.GetString("username")</span>
+            <a href="/Logout">Logout</a>
+            }
+            else
+            {
             <a href="/LoginUI">Login</a>
             <a href="/CreateAccountUI">Create Account</a>
+            }
         </div>
     </nav>
 

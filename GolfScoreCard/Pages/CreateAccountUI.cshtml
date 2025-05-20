@@ -1,5 +1,5 @@
 @page
-@model GolfScoreCard.Pages.CreateAccountUI
+@model GolfScoreCard.Pages.CreateAccountUIModel
 @{
 ViewData["Title"] = "Create Account";
 }
@@ -19,11 +19,22 @@ ViewData["Title"] = "Create Account";
         <div class="hero-content">
             <h1>Create Your Account</h1>
             <form method="post" class="auth-form">
-                <input type="text" name="username" placeholder="Username" required />
-                <input type="email" name="email" placeholder="Email" required />
-                <input type="password" name="password" placeholder="Password" required />
+                @Html.AntiForgeryToken()
+                <input name="Username" placeholder="Username" required/>
+                <input type="password" name="Password" placeholder="Password" required/>
+                <select name="Sex" required>
+                    <option value="">Select Sex</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <input type="number" name="Handicap" step="0.1" placeholder="Handicap" required/>
                 <button type="submit">Sign Up</button>
             </form>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+            <p style="color: red;">@ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage</p>
+            }
         </div>
     </div>
 </section>

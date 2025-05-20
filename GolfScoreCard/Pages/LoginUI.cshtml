@@ -1,8 +1,5 @@
 @page
 @model GolfScoreCard.Pages.LoginUIModel
-@{
-ViewData["Title"] = "Login";
-}
 
 <section class="hero">
     <nav class="hero-nav">
@@ -19,10 +16,16 @@ ViewData["Title"] = "Login";
         <div class="hero-content">
             <h1>Welcome Back</h1>
             <form method="post" class="auth-form">
-                <input type="text" name="username" placeholder="Username" required />
-                <input type="password" name="password" placeholder="Password" required />
+                @Html.AntiForgeryToken()
+                <input name="Username" placeholder="Username" required />
+                <input name="Password" type="password" placeholder="Password" required />
                 <button type="submit">Log In</button>
             </form>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+            <p style="color: red;">@ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage</p>
+            }
         </div>
     </div>
 </section>

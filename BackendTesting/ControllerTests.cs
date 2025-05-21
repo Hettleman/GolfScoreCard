@@ -19,8 +19,7 @@ public class ControllerTests
 
         return new AppDbContext(options);
     }
-
-    // UsersController Tests
+    
 
     [Fact]
     public async Task CreateUser_ShouldReturnOk_WhenValid()
@@ -32,8 +31,8 @@ public class ControllerTests
         {
             username = "testuser",
             passwordHash = "plaintextpassword",
-            sex = "Male",    // Added required field
-            handicap = 0     // Added required field
+            sex = "Male",  
+            handicap = 0     
         };
 
         var result = await controller.CreateUser(user);
@@ -93,8 +92,7 @@ public class ControllerTests
         var result = await controller.DeleteUser("ghost");
         Assert.IsType<NotFoundObjectResult>(result);
     }
-
-    // ScoresController Tests
+    
 
     [Fact]
     public async Task AddScore_ShouldReturnBadRequest_WhenUserDoesNotExist()
@@ -169,5 +167,47 @@ public class ControllerTests
         Assert.NotNull(result);
         var scores = Assert.IsType<List<Score>>(result.Value);
         Assert.Single(scores);
+    }
+    
+    [Fact]
+    public async Task UpdateHandicap_ShouldReturnNotFound_IfUserDoesNotExist()
+    {
+        var context = GetInMemoryDbContext();
+        var controller = new UsersController(context);
+
+        var result = await controller.UpdateHandicap("missinguser", 12.5m);
+
+        Assert.IsType<NotFoundObjectResult>(result);
+    }
+
+    [Fact]
+    public async Task UpdateHandicap_ShouldUpdateAndReturnOk_WhenUserExists()
+    {
+        var context = GetInMemoryDbContext();
+
+        var user = new User
+        {
+            username = "golfer1",
+            passwordHash = "securehash",
+            sex = "Male",
+            handicap = 10m
+        };
+
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        var controller = new UsersController(context);
+        var result = await controller.UpdateHandicap("golfer1", 15m);
+
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        dynamic response = okResult.Value;
+
+        Assert.Equal("golfer1", (string)response.username);
+        Assert.Equal(10m, (decimal)response.oldHandicap);
+        Assert.Equal(15m, (decimal)response.newHandicap);
+        Assert.Equal("Handicap updated successfully.", (string)response.message);
+
+        var updatedUser = await context.Users.FindAsync("golfer1");
+        Assert.Equal(15m, updatedUser.handicap);
     }
 }

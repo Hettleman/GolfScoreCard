@@ -73,23 +73,18 @@ namespace GolfScoreCard.Controllers
         [HttpPut("{username}/handicap")]
         public async Task<IActionResult> UpdateHandicap(string username, [FromBody] decimal newHandicap)
         {
-            // 1) Fetch
             var user = await _context.Users.FindAsync(username);
             if (user == null)
                 return NotFound(new { message = "User not found." });
-
-            // 2) Store old, assign new
+            
             var oldHandicap = user.handicap;
             user.handicap = newHandicap;
-
-            // 3) Persist
+            
             await _context.SaveChangesAsync();
-
-            // 4) Notify observer
+            
             var observer = new HandicapObserver();
             observer.HandicapChange(user, oldHandicap, newHandicap);
-
-            // 5) Return
+            
             return Ok(new
             {
                 username,

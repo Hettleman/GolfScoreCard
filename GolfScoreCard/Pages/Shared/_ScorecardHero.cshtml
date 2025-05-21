@@ -8,8 +8,8 @@
         <div class="nav-links">
             @if (Context.Session.GetString("username") != null)
             {
-            <span class="nav-username">@Context.Session.GetString("username")</span>
-            <a href="/Logout">Logout</a>
+            <a href="/ProfileUI" class="nav-username">@Context.Session.GetString("username")</a>
+            <a href="/LogoutUI">Logout</a>
             }
             else
             {

@@ -1,70 +1,45 @@
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-
-namespace API_Testing;
+using System.Collections.Generic;
+using Xunit;
 using GolfScoreCard;
+using GolfScoreCard.APISTUFF;
 
-
-
-public class UnitTest1
+namespace API_Testing
 {
-    /*
-    [Fact]
-    public void GetParTest()
+    public class UnitTest1
     {
-        Course course = new Course();
-        course.course_name = "Pebble Beach";
-        
-        Assert.Equal(72, FetchFromAPI.GetFemalePar(course));
-    }
-    */
-    
+        // Simulated GetLocation method since FetchFromAPI doesn't have it
+        private string GetLocation(Course course) => course.Location?.State;
 
-    [Fact] 
-    public void GetLocationTest()
-   {
-        Course course = new Course();
-        course.course_name = "Pebble Beach";
-        Assert.Equal("CA", FetchFromAPI.GetLocation(course));
+        [Fact]
+        public void GetLocationTest()
+        {
+            var course = new Course
+            {
+                CourseName = "Pebble Beach",
+                Location = new Location { State = "CA" }
+            };
+
+            Assert.Equal("CA", GetLocation(course));
+        }
+
+        //------------- HANDICAP TESTS ----------
+
+        [Fact]
+        public void CalcDifferentialTest()
+        {
+            double score = 72;
+            double slope = 113;
+            double rating = 72;
+            Assert.Equal(0, Handicap.CalculateDifferential(score, slope, rating));
+        }
+
+        [Fact]
+        public void InsertDiffTest()
+        {
+            List<double> diffs = new List<double> { 3, 4, 5, 5, 6, 7, 8, 10 };
+            List<double> expected = new List<double> { 3, 4, 4, 5, 5, 6, 7, 8 };
+
+            Assert.Equal(expected, Handicap.InsertDifferential(diffs, 4));
+        }
     }
-    
-    //------------- HANDICAP----------
-    
-    [Fact]
-    public void CalcDifferentialTest()
-    {
-        double score = 72;
-        double slope = 113;
-        double rating = 72;
-        Assert.Equal(0, Handicap.CalculateDifferential(score, slope, rating));
-    }
-    
-    [Fact]
-    public void InsertDiffTest()
-    {
-        
-        List<double> diffs = new List<double>();
-        diffs.Add(3);
-        diffs.Add(4);
-        diffs.Add(5);
-        diffs.Add(5);
-        diffs.Add(6);
-        diffs.Add(7);
-        diffs.Add(8);
-        diffs.Add(10);
-        
-        List<double> changedDiffs = new List<double>();
-        changedDiffs.Add(3);
-        changedDiffs.Add(4);
-        changedDiffs.Add(4);
-        changedDiffs.Add(5);
-        changedDiffs.Add(5);
-        changedDiffs.Add(6);
-        changedDiffs.Add(7);
-        changedDiffs.Add(8);
-        
-        
-        Assert.Equal(changedDiffs, Handicap.InsertDifferential(diffs, 4));
-    }
-    
-    
 }

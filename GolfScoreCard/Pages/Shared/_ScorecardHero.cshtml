@@ -22,104 +22,170 @@
     <div class="hero-overlay"></div>
 
     <div class="scorecard-container">
-        <div class="scorecard-card">
-            <table class="scorecard-table">
-                <thead>
-                <tr>
-                    <th>Hole</th>
-                    @for (int i = 1; i <= 9; i++) { <th>@i</th> }
-                    <th>Out</th>
-                    @for (int i = 10; i <= 18; i++) { <th>@i</th> }
-                    <th>In</th>
-                    <th>Tot</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <th>Distance</th>
-                    @for (int i = 0; i < 9; i++) { <td>@Model.HoleDistances[i]</td> }
-                    <td></td>
-                    @for (int i = 9; i < 18; i++) { <td>@Model.HoleDistances[i]</td> }
-                    <td></td>
-                    <td>
-                        @Model.HoleDistances.Take(18).Sum()
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Par</th>
-                    @for (int i = 0; i < 9; i++) { <td>@Model.HolePars[i]</td> }
-                    <td>@Model.HolePars.Skip(9).Take(9).Sum()</td>
-                    @for (int i = 9; i < 18; i++) { <td>@Model.HolePars[i]</td> }
-                    <td>@Model.HolePars.Take(9).Sum()</td>
-                    <td>@Model.HolePars.Sum()</td>
-                </tr>
-
-                <tr>
-                    <th>Player 1</th>
-
-                    @* Holes 1–9 *@
-                    @for (int i = 0; i < 9; i++)
-                    {
+        <div id="score-submit-banner" class="banner" style="display:none;"></div>
+        <form method="post" onsubmit="submitScore(event)">>
+            <div class="scorecard-card">
+                <table class="scorecard-table">
+                    <thead>
+                    <tr>
+                        <th>Hole</th>
+                        @for (int i = 1; i <= 9; i++)
+                        {
+                            <th>@i</th>
+                        }
+                        <th>Out</th>
+                        @for (int i = 10; i <= 18; i++)
+                        {
+                            <th>@i</th>
+                        }
+                        <th>In</th>
+                        <th>Tot</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th>Distance</th>
+                        @for (int i = 0; i < 9; i++)
+                        {
+                            <td>@Model.HoleDistances[i]</td>
+                        }
+                        <td></td>
+                        @for (int i = 9; i < 18; i++)
+                        {
+                            <td>@Model.HoleDistances[i]</td>
+                        }
+                        <td></td>
                         <td>
-                            <input type="text"
-                                   name="Score1[@i]"
-                                   class="score1"
-                                   autocomplete="off" />
+                            @Model.HoleDistances.Take(18).Sum()
                         </td>
-                    }
+                    </tr>
 
-                    @* Out sum (holes 1–9) *@
-                    <td id="player1_out"></td>
+                    <tr>
+                        <th>Par</th>
+                        @for (int i = 0; i < 9; i++)
+                        {
+                            <td>@Model.HolePars[i]</td>
+                        }
+                        <td>@Model.HolePars.Skip(9).Take(9).Sum()</td>
+                        @for (int i = 9; i < 18; i++)
+                        {
+                            <td>@Model.HolePars[i]</td>
+                        }
+                        <td>@Model.HolePars.Take(9).Sum()</td>
+                        <td>@Model.HolePars.Sum()</td>
+                    </tr>
 
-                    @* Holes 10–18 *@
-                    @for (int i = 9; i < 18; i++)
-                    {
-                        <td>
-                            <input type="text"
-                                   name="Score1[@i]"
-                                   class="score1"
-                                   autocomplete="off" />
-                        </td>
-                    }
+                    <tr>
+                        <th>Player 1</th>
 
-                    @* In sum (holes 10–18) *@
-                    <td id="player1_in"></td>
+                        @* Holes 1–9 *@
+                        @for (int i = 0; i < 9; i++)
+                        {
+                            <td>
+                                <input type="text"
+                                       name="Score1[@i]"
+                                       class="score1"
+                                       autocomplete="off"/>
+                            </td>
+                        }
 
-                    @* Total sum (all 18) *@
-                    <td id="player1_tot"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                        @* Out sum (holes 1–9) *@
+                        <td id="player1_out"></td>
 
-    <div class="submit-score">
-        <a href="/Index" class="btn btn-primary">
-            Submit Score
-        </a>
+                        @* Holes 10–18 *@
+                        @for (int i = 9; i < 18; i++)
+                        {
+                            <td>
+                                <input type="text"
+                                       name="Score1[@i]"
+                                       class="score1"
+                                       autocomplete="off"/>
+                            </td>
+                        }
+
+                        @* In sum (holes 10–18) *@
+                        <td id="player1_in"></td>
+
+                        @* Total sum (all 18) *@
+                        <td id="player1_tot"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <input type="hidden" id="selectedCourseName" name="CourseName" value="@Model.CourseName" />
+            <input type="hidden" id="TotalScore" name="TotalScore" value="0" />
+            <input type="hidden" name="CoursePar" value="@Model.HolePars.Sum()" />
+
+            <div class="submit-score">
+                <button type="submit" class="btn btn-primary">Submit Score</button>
+            </div>
+        </form>
     </div>
 </section>
 
 <script>
-    // grab all of Player 1’s inputs
     const inputs1 = Array.from(document.querySelectorAll('input.score1'));
 
     function recalc1() {
-        const vals = inputs1.map(i => {
-            const n = parseInt(i.value, 10);
-            return isNaN(n) ? 0 : n;
-        });
-
+        const vals = inputs1.map(i => parseInt(i.value, 10) || 0);
         const out = vals.slice(0, 9).reduce((a, b) => a + b, 0);
         const inn = vals.slice(9).reduce((a, b) => a + b, 0);
         const tot = out + inn;
 
         document.getElementById('player1_out').textContent = out;
-        document.getElementById('player1_in').textContent  = inn;
+        document.getElementById('player1_in').textContent = inn;
         document.getElementById('player1_tot').textContent = tot;
+        document.getElementById('TotalScore').value = tot; // 👈 this sets your hidden field
     }
 
     inputs1.forEach(i => i.addEventListener('input', recalc1));
     recalc1();
+
+    async function submitScore(event) {
+        event.preventDefault(); // stop default form submission
+
+        const scores = Array.from(document.querySelectorAll('input.score1'))
+        .map(i => parseInt(i.value, 10))
+        .map(n => isNaN(n) ? 0 : n);
+
+        const totalScore = scores.reduce((a, b) => a + b, 0);
+        document.getElementById("TotalScore").value = totalScore;
+
+        const payload = {
+            username: "@Context.Session.GetString("username")",
+            courseName: document.getElementById("selectedCourseName").value,
+            userScore: totalScore,
+            coursePar: parseInt(document.querySelector('input[name="CoursePar"]').value),
+            dateTime: new Date().toISOString()
+        };
+
+        const res = await fetch('/api/scores', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            showSuccessBanner("Score submitted successfully! Redirecting...");
+            setTimeout(() => window.location.href = "/ProfileUI", 2000);
+        } else {
+            const errorText = await res.text();
+            showErrorBanner("Failed to submit: " + errorText);
+        }
+    }
+
+    function showSuccessBanner(message) {
+        const banner = document.getElementById("score-submit-banner");
+        banner.textContent = message;
+        banner.className = "banner success";
+        banner.style.display = "block";
+    }
+
+        function showErrorBanner(message) {
+        const banner = document.getElementById("score-submit-banner");
+        banner.textContent = message;
+        banner.className = "banner error";
+        banner.style.display = "block";
+    }
 </script>
+

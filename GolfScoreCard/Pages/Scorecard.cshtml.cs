@@ -4,20 +4,31 @@ using System.Linq;                       // for FirstOrDefault() and Select()
 using System.Text.Json;                 // for JsonSerializer & JsonSerializerOptions
 using Microsoft.AspNetCore.Hosting;     // for IWebHostEnvironment
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using GolfScoreCard.APISTUFF;           // for CourseResponse, Course, Tees, Tee, Hole
+using GolfScoreCard.APISTUFF;
+using Microsoft.AspNetCore.Mvc; // for CourseResponse, Course, Tees, Tee, Hole
 
 namespace GolfScoreCard.Pages
 {
     public class ScorecardModel : PageModel
     {
+
         private readonly IWebHostEnvironment _env;
+        private readonly AppDbContext _db;
 
         public int[]  HolePars       { get; private set; }
         public int[]  HoleDistances { get; private set; }
-        public string CourseName    { get; private set; }
+        [BindProperty] public string CourseName { get; set; }
+        [BindProperty] public int CoursePar { get; set; }
+        [BindProperty] public int TotalScore { get; set; }
 
-        public ScorecardModel(IWebHostEnvironment env)
-            => _env = env;
+
+
+        public ScorecardModel(AppDbContext db, IWebHostEnvironment env)
+        {
+            _db = db; 
+            _env = env;
+        }
+                
 
         public void OnGet()
         {
@@ -45,7 +56,8 @@ namespace GolfScoreCard.Pages
                 return;
             }
 
-            CourseName = $"{course.ClubName} – {course.CourseName}";
+            var combinedName = course.ClubName + " - " + course.CourseName;
+            CourseName = combinedName.Length > 50 ? combinedName.Substring(0, 50) : combinedName;
 
             // 1) default to male tees, 2) fallback to female
             var defaultTee = course.Tees?.Male?.FirstOrDefault()
@@ -72,6 +84,29 @@ namespace GolfScoreCard.Pages
 
             HoleDistances = blueTee.Holes.Select(h => h.Yardage).ToArray();
         }
+        
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var username = HttpContext.Session.GetString("username");
+
+            if (string.IsNullOrEmpty(username))
+                return RedirectToPage("/LoginUI");
+
+            var scoreEntry = new Score
+            {
+                username = username,
+                courseName = CourseName,
+                userScore = TotalScore,
+                coursePar = CoursePar,
+                dateTime = DateTime.UtcNow
+            };
+
+            _db.Scores.Add(scoreEntry);
+            await _db.SaveChangesAsync();
+
+            return RedirectToPage("/ProfileUI"); // or thank-you page
+        }
+
 
     }
 }

@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GolfScoreCard\GolfScoreCard.csproj" />
+        <ProjectReference Include="..\GolfScoreCard\GolfScoreCard.csproj" />
     </ItemGroup>
 
 </Project>

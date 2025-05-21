@@ -1,0 +1,92 @@
+@page
+@model GolfScoreCard.Pages.ProfileUIModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<style>
+    .profile-container {
+        position: relative;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 4rem auto;
+        max-width: 900px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        color: #000;
+    }
+
+    .profile-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .score-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .score-table th,
+    .score-table td {
+        border: 1px solid #ccc;
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .score-table th {
+        background-color: #f0f0f0;
+    }
+</style>
+
+<section class="hero">
+    <nav class="hero-nav">
+        <div class="logo">
+            <a href="/" class="nav-logo">ParPal</a>
+        </div>
+        <div class="nav-links">
+            @if (HttpContext.Session.GetString("username") != null)
+            {
+            <a href="/ProfileUI" class="nav-username">@HttpContext.Session.GetString("username")</a>
+            <a href="/LogoutUI">Logout</a>
+            }
+            else
+            {
+                <a href="/LoginUI">Login</a>
+                <a href="/CreateAccountUI">Create Account</a>
+            }
+        </div>
+    </nav>
+
+    <div class="hero-overlay"></div>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2>@Model.Username's Profile</h2>
+            <p>Handicap: @Model.Handicap</p>
+        </div>
+
+        <h3>Past Rounds</h3>
+        <table class="score-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Course</th>
+                    <th>Your Score</th>
+                    <th>Par</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var round in Model.PastScores)
+                {
+                    <tr>
+                        <td>@round.dateTime.ToShortDateString()</td>
+                        <td>@round.courseName</td>
+                        <td>@round.userScore</td>
+                        <td>@round.coursePar</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,54 @@
+@page
+@model GolfScoreCard.Pages.LogoutUIModel
+@{
+    ViewData["Title"] = "Logout";
+}
+
+<style>
+    .logout-message {
+        position: relative;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 4rem auto;
+        max-width: 800px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        font-size: 1.25rem;
+        color: #000;
+        line-height: 1.6;
+    }
+
+    .logout-message a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .logout-message a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<section class="hero">
+    <nav class="hero-nav">
+        <div class="logo">
+            <a href="/" class="nav-logo">ParPal</a>
+        </div>
+        <div class="nav-links">
+            <a href="/LoginUI">Login</a>
+            <a href="/CreateAccountUI">Create Account</a>
+        </div>
+    </nav>
+
+    <div class="hero-overlay">
+        <div class="hero-content">
+            <div class="logout-message">
+                You have been successfully logged out.<br />
+                <a href="/LoginUI">Click here to login again</a>
+            </div>
+        </div>
+    </div>
+    
+</section>

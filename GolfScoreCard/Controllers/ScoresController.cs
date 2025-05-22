@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using GolfScoreCard; // for Score & User
+using GolfScoreCard;
+using GolfScoreCard.Logic;
 
 namespace GolfScoreCard.Controllers
 {
@@ -12,7 +13,11 @@ namespace GolfScoreCard.Controllers
     public class ScoresController : ControllerBase
     {
         private readonly AppDbContext _context;
-        public ScoresController(AppDbContext context) => _context = context;
+
+        public ScoresController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpPost]
         public async Task<IActionResult> AddScore([FromBody] Score score)
@@ -34,9 +39,8 @@ namespace GolfScoreCard.Controllers
                 score.dateTime = DateTime.UtcNow;
 
             _context.Scores.Add(score);
-            await _context.SaveChangesAsync(); // ✅ Save new score
+            await _context.SaveChangesAsync();
 
-            // 🔢 HANDICAP CALCULATION LOGIC
             double courseRating = Request.Headers.TryGetValue("CourseRating", out var ratingVal) && double.TryParse(ratingVal, out var rVal)
                 ? rVal : 0;
 
@@ -49,29 +53,30 @@ namespace GolfScoreCard.Controllers
                     .Where(s => s.username == score.username)
                     .ToListAsync();
 
+                var calculator = HandicapCalculator.Instance;
+
                 var differentials = allScores
-                    .Select(s => (s.userScore - courseRating) * 113 / courseSlope)
+                    .Select(s => calculator.CalculateDifferential(s.userScore, courseRating, courseSlope))
                     .OrderBy(d => d)
                     .Take(5)
                     .ToList();
 
                 if (differentials.Count > 0)
                 {
-                    double avgHandicap = differentials.Average();
-                    user.handicap = Math.Round((decimal)avgHandicap, 1);
-                    await _context.SaveChangesAsync(); // ✅ Save updated handicap
+                    user.handicap = calculator.CalculateAverage(differentials);
+                    await _context.SaveChangesAsync();
                 }
             }
 
             return Ok("Score added and handicap updated.");
         }
 
-
         [HttpDelete("{scoreId}")]
         public async Task<IActionResult> DeleteScore(int scoreId)
         {
             var score = await _context.Scores.FindAsync(scoreId);
-            if (score == null) return NotFound("Score not found.");
+            if (score == null)
+                return NotFound("Score not found.");
 
             _context.Scores.Remove(score);
             await _context.SaveChangesAsync();
@@ -86,6 +91,7 @@ namespace GolfScoreCard.Controllers
 
             var scores = await _context.Scores
                 .Where(s => s.username == username)
+                .OrderByDescending(s => s.dateTime)
                 .ToListAsync();
 
             return Ok(scores);

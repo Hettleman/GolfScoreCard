@@ -25,6 +25,10 @@
         <div id="score-submit-banner" class="banner" style="display:none;"></div>
         <form method="post" onsubmit="submitScore(event)">>
             <div class="scorecard-card">
+                <div class="course-info">
+                    <h2 class="course-title">@Model.CourseName</h2>
+                    <p class="course-meta">Rating: @Model.CourseRating | Slope: @Model.CourseSlope</p>
+                </div>
                 <table class="scorecard-table">
                     <thead>
                     <tr>
@@ -115,6 +119,11 @@
             <input type="hidden" id="selectedCourseName" name="CourseName" value="@Model.CourseName" />
             <input type="hidden" id="TotalScore" name="TotalScore" value="0" />
             <input type="hidden" name="CoursePar" value="@Model.HolePars.Sum()" />
+            <input type="hidden" id="selectedCourseRating" value="@Model.CourseRating" />
+            <input type="hidden" id="selectedCourseSlope" value="@Model.CourseSlope" />
+
+
+
 
             <div class="submit-score">
                 <button type="submit" class="btn btn-primary">Submit Score</button>
@@ -161,7 +170,11 @@
 
         const res = await fetch('/api/scores', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                "Content-Type": "application/json",
+                "CourseRating": document.getElementById("selectedCourseRating").value,
+                "CourseSlope": document.getElementById("selectedCourseSlope").value
+            },
             body: JSON.stringify(payload)
         });
 

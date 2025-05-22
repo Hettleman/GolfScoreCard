@@ -36,4 +36,6 @@ public class Score
     [Required]
     [Column("date_time")]
     public DateTime dateTime { get; set; }
+    
+
 }

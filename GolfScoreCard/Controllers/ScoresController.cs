@@ -24,8 +24,7 @@ namespace GolfScoreCard.Controllers
             if (user == null)
                 return BadRequest("User does not exist.");
 
-            if (string.IsNullOrWhiteSpace(score.courseName)
-             || score.courseName.Length > 50)
+            if (string.IsNullOrWhiteSpace(score.courseName) || score.courseName.Length > 50)
                 return BadRequest("Course name is required and must be 50 characters or fewer.");
 
             if (score.userScore <= 0 || score.coursePar <= 0)
@@ -35,9 +34,38 @@ namespace GolfScoreCard.Controllers
                 score.dateTime = DateTime.UtcNow;
 
             _context.Scores.Add(score);
-            await _context.SaveChangesAsync();
-            return Ok("Score added successfully.");
+            await _context.SaveChangesAsync(); // ✅ Save new score
+
+            // 🔢 HANDICAP CALCULATION LOGIC
+            double courseRating = Request.Headers.TryGetValue("CourseRating", out var ratingVal) && double.TryParse(ratingVal, out var rVal)
+                ? rVal : 0;
+
+            int courseSlope = Request.Headers.TryGetValue("CourseSlope", out var slopeVal) && int.TryParse(slopeVal, out var sVal)
+                ? sVal : 0;
+
+            if (courseRating > 0 && courseSlope > 0)
+            {
+                var allScores = await _context.Scores
+                    .Where(s => s.username == score.username)
+                    .ToListAsync();
+
+                var differentials = allScores
+                    .Select(s => (s.userScore - courseRating) * 113 / courseSlope)
+                    .OrderBy(d => d)
+                    .Take(5)
+                    .ToList();
+
+                if (differentials.Count > 0)
+                {
+                    double avgHandicap = differentials.Average();
+                    user.handicap = Math.Round((decimal)avgHandicap, 1);
+                    await _context.SaveChangesAsync(); // ✅ Save updated handicap
+                }
+            }
+
+            return Ok("Score added and handicap updated.");
         }
+
 
         [HttpDelete("{scoreId}")]
         public async Task<IActionResult> DeleteScore(int scoreId)

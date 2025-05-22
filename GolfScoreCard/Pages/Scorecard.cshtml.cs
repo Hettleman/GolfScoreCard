@@ -20,8 +20,9 @@ namespace GolfScoreCard.Pages
         [BindProperty] public string CourseName { get; set; }
         [BindProperty] public int CoursePar { get; set; }
         [BindProperty] public int TotalScore { get; set; }
-
-
+        [BindProperty] public double CourseRating { get; set; }
+        [BindProperty] public int CourseSlope { get; set; }
+        
 
         public ScorecardModel(AppDbContext db, IWebHostEnvironment env)
         {
@@ -72,6 +73,9 @@ namespace GolfScoreCard.Pages
 
             // pars from the chosen default
             HolePars = defaultTee.Holes.Select(h => h.Par).ToArray();
+            CourseRating = defaultTee.CourseRating;
+            CourseSlope = defaultTee.SlopeRating;
+
 
             // blue from male first, then female, then default
             var blueTee = course.Tees?.Male?
@@ -103,10 +107,9 @@ namespace GolfScoreCard.Pages
 
             _db.Scores.Add(scoreEntry);
             await _db.SaveChangesAsync();
-
-            return RedirectToPage("/ProfileUI"); // or thank-you page
+            
+            return RedirectToPage("/ProfileUI");
         }
-
-
+        
     }
 }

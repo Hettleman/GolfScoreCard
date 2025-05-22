@@ -9,36 +9,36 @@ using GolfScoreCard.Observers;
 namespace GolfScoreCard.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // controller class for talking to the API
     public class UsersController : ControllerBase //controller class for talking to the API
     {
-        private readonly AppDbContext _context;
-        public UsersController(AppDbContext context) => _context = context;
+        private readonly AppDbContext _context; //private field for the database context
+        public UsersController(AppDbContext context) => _context = context; //constructor
 
         [HttpPost] // POST method for creating a new user
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        public async Task<IActionResult> CreateUser([FromBody] User user) //user class for creating a new user
         {
-            if (string.IsNullOrWhiteSpace(user.username)
+            if (string.IsNullOrWhiteSpace(user.username) //verify username and password are not null
                 || user.username.Length < 3
                 || user.username.Length > 30)
                 return BadRequest("Username must be between 3 and 30 characters.");
 
-            if (string.IsNullOrWhiteSpace(user.passwordHash)
+            if (string.IsNullOrWhiteSpace(user.passwordHash) //verify password length
                 || user.passwordHash.Length < 6)
                 return BadRequest("Password must be at least 6 characters.");
 
-            if (string.IsNullOrWhiteSpace(user.sex)
+            if (string.IsNullOrWhiteSpace(user.sex) //verify sex is valid value
                 || (user.sex != "male" && user.sex != "female" && user.sex != "other"))
                 return BadRequest("Sex must be 'male', 'female', or 'other'.");
 
-            if (user.handicap < 0 || user.handicap > 54)
+            if (user.handicap < 0 || user.handicap > 54) //verify handicap is valid value
                 return BadRequest("Handicap must be between 0 and 54.");
 
-            if (await _context.Users.AnyAsync(u => u.username == user.username))
+            if (await _context.Users.AnyAsync(u => u.username == user.username)) //verify username is unique
                 return BadRequest("Username already exists.");
 
-            user.passwordHash = BCrypt.Net.BCrypt.HashPassword(user.passwordHash);
-            _context.Users.Add(user);
+            user.passwordHash = BCrypt.Net.BCrypt.HashPassword(user.passwordHash); //hash password
+            _context.Users.Add(user); //add user to database
             await _context.SaveChangesAsync(); //save changes to database
 
             return Ok("User created successfully.");
@@ -85,7 +85,7 @@ namespace GolfScoreCard.Controllers
             var observer = new HandicapObserver(); //create observer instance
             observer.HandicapChange(user, oldHandicap, newHandicap); //notify observer of change
             
-            return Ok(new
+            return Ok(new //return updated handicap
             {
                 username,
                 oldHandicap,

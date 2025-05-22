@@ -90,28 +90,4 @@ namespace GolfScoreCard.Strategy
             return _strategy.ComputeHandicap(scores, slopes, ratings);
         }
     }
-
-    // 4. Example usage
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var scores = new List<double> { 72, 73, 73, 74, 74, 74, 75, 76, 77, 79,
-                                            80, 81, 81, 81, 82, 83, 83, 84, 85, 86 };
-            var slopes = new List<double> { 113, 123, 119, 110, 134, 123, 112, 132, 133, 123,
-                                            142, 123, 130, 128, 120, 121, 114, 132, 154, 123 };
-            var ratings = new List<double> { 72, 71, 72, 72, 71, 72, 73, 71, 71, 72,
-                                             70, 71, 72, 73, 72, 71, 71, 72, 72, 72 };
-
-            // Strategy with USGA adjustment
-            Console.WriteLine("-- USGA Handicap (0.96 multiplier) --");
-            var usgaContext = new HandicapContext(new UsgaHandicapStrategy());
-            usgaContext.Calculate(scores, slopes, ratings);
-
-            // Strategy without adjustment
-            Console.WriteLine("-- Raw Handicap (no multiplier) --");
-            var rawContext = new HandicapContext(new RawHandicapStrategy());
-            rawContext.Calculate(scores, slopes, ratings);
-        }
-    }
 }

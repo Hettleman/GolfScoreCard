@@ -1,7 +1,9 @@
-﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:schemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5b163945_002D9d6a_002D421a_002Dadcb_002D0eec076c1413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;API Testing&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Or&gt;
     &lt;ProjectFile&gt;317B9BE6-DFAE-4E29-8A29-D0680DCBF589/f:TableMappingTests.cs&lt;/ProjectFile&gt;
     &lt;ProjectFile&gt;317B9BE6-DFAE-4E29-8A29-D0680DCBF589/f:ControllerTests.cs&lt;/ProjectFile&gt;
+    &lt;ProjectFile&gt;317B9BE6-DFAE-4E29-8A29-D0680DCBF589/f:ObserverTests.cs&lt;/ProjectFile&gt;
+    &lt;Project Location="/Users/jsanderswp/RiderProjects/GolfScoreCard/UnitTests" Presentation="&amp;lt;UnitTests&amp;gt;" /&gt;
   &lt;/Or&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

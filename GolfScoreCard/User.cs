@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace GolfScoreCard;
 
 
-[Table("Users")]
+[Table("Users")] //Users class mapped to SQL table
 public class User
 {
     [Key]
     [MaxLength(30)]
     public string username { get; set; }
 
-    [Column("password_hash")]
+    [Column("password_hash")] //hash of password stored, not the actual password
     [Required]
     [MaxLength(255)]
     public string passwordHash { get; set; }

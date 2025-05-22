@@ -1,13 +1,9 @@
-using Xunit;
 using Microsoft.EntityFrameworkCore;
 using GolfScoreCard.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 namespace BackendTesting;
 using GolfScoreCard;
+using Microsoft.AspNetCore.Http;
 
 public class ControllerTests
 {
@@ -116,15 +112,23 @@ public class ControllerTests
     public async Task AddScore_ShouldReturnOk_WhenValid()
     {
         var context = GetInMemoryDbContext();
-        context.Users.Add(new User { 
-            username = "player1", 
+        context.Users.Add(new User {
+            username = "player1",
             passwordHash = "hashed",
-            sex = "male",  
-            handicap = 0     
+            sex = "male",
+            handicap = 0
         });
         await context.SaveChangesAsync();
 
         var controller = new ScoresController(context);
+
+        // 🔥 This is critical!
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.Request.Headers["CourseRating"] = "72";
+        controller.Request.Headers["CourseSlope"] = "113";
 
         var score = new Score
         {
@@ -137,6 +141,7 @@ public class ControllerTests
         var result = await controller.AddScore(score);
         Assert.IsType<OkObjectResult>(result);
     }
+
 
     [Fact]
     public async Task DeleteScore_ShouldReturnNotFound_IfScoreNotExists()

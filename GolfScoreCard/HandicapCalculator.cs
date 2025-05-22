@@ -7,7 +7,7 @@ namespace GolfScoreCard.Logic
 
         private HandicapCalculator() { }
 
-        public double CalculateDifferential(int score, double courseRating, int courseSlope)
+        public double CalculateDifferential(double score, double courseRating, double courseSlope)
         {
             return (score - courseRating) * 113 / courseSlope;
         }

@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GolfScoreCard;
 
-[Table("Scores")]
+[Table("Scores")] //scores class mapped to SQL table
 public class Score
 {
     [Key]
-    [Column("score_id")]
+    [Column("score_id")] //Primary key for scores table
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int scoreId { get; set; }
 
-    [Required]
+    [Required] //This is passed in via the corresponding user
     [MaxLength(30)]
     [Column("username")]
     public string username { get; set; }
 
-    [NotMapped]
+    [NotMapped] //Foreign key relationship with User via username
     [ForeignKey("username")]
     public User? User { get; set; }
 

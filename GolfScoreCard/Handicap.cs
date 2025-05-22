@@ -85,10 +85,9 @@ namespace GolfScoreCard.Strategy
             _strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         }
 
-        public void Execute(List<double> scores, List<double> slopes, List<double> ratings)
+        public double Calculate(List<double> scores, List<double> slopes, List<double> ratings)
         {
-            double handicap = _strategy.ComputeHandicap(scores, slopes, ratings);
-            Console.WriteLine($"Your handicap based on your last {scores.Count} rounds: {handicap:F1}");
+            return _strategy.ComputeHandicap(scores, slopes, ratings);
         }
     }
 
@@ -107,12 +106,12 @@ namespace GolfScoreCard.Strategy
             // Strategy with USGA adjustment
             Console.WriteLine("-- USGA Handicap (0.96 multiplier) --");
             var usgaContext = new HandicapContext(new UsgaHandicapStrategy());
-            usgaContext.Execute(scores, slopes, ratings);
+            usgaContext.Calculate(scores, slopes, ratings);
 
             // Strategy without adjustment
             Console.WriteLine("-- Raw Handicap (no multiplier) --");
             var rawContext = new HandicapContext(new RawHandicapStrategy());
-            rawContext.Execute(scores, slopes, ratings);
+            rawContext.Calculate(scores, slopes, ratings);
         }
     }
 }

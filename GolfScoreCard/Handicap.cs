@@ -1,91 +1,118 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace GolfScoreCard
+namespace GolfScoreCard.Strategy
 {
-    public class Handicap
-    { 
-        public static double HandicapCalc(List<double> scores, List<double> slopes, List<double> ratings)
+    // 1. Strategy interface
+    public interface IHandicapStrategy
+    {
+        double ComputeHandicap(List<double> scores, List<double> slopes, List<double> ratings);
+    }
+
+    // Concrete strategy: with .96 excellency
+    public class UsgaHandicapStrategy : IHandicapStrategy
+    {
+        public double ComputeHandicap(List<double> scores, List<double> slopes, List<double> ratings)
         {
-            double handicap;
-            var topEight = new List<double>();
+            ValidateInputs(scores, slopes, ratings);
+
+            var diffs = CalculateDifferentials(scores, slopes, ratings);
+            var topEight = GetLowestDifferentials(diffs, 8);
+            return CalculateHandicap(topEight, applyMultiplier: true);
+        }
+
+        private void ValidateInputs(List<double> scores, List<double> slopes, List<double> ratings)
+        {
+            if (scores == null || slopes == null || ratings == null)
+                throw new ArgumentNullException("Input lists cannot be null.");
+            if (scores.Count != slopes.Count || scores.Count != ratings.Count)
+                throw new ArgumentException("Scores, slopes, and ratings must have the same count.");
+        }
+
+        private List<double> CalculateDifferentials(List<double> scores, List<double> slopes, List<double> ratings)
+        {
+            var differentials = new List<double>();
             for (int i = 0; i < scores.Count; i++)
             {
-                double thisDifferential = CalculateDifferential(scores[i], slopes[i], ratings[i]);
-
-                if (topEight.Count < 8)
-                {
-                    topEight.Add(thisDifferential);
-                    topEight.Sort();
-                }
-                else
-                {
-                    if (thisDifferential < topEight[7])
-                    {
-                        InsertDifferential(topEight, thisDifferential);
-                    }
-                }
+                double diff = (scores[i] - ratings[i]) * (113.0 / slopes[i]);
+                differentials.Add(diff);
             }
+            return differentials;
+        }
 
-            for (int i = 0; i < 8; i++)
+        private List<double> GetLowestDifferentials(List<double> diffs, int count)
+        {
+            diffs.Sort();
+            return diffs.GetRange(0, Math.Min(count, diffs.Count));
+        }
+
+        private double CalculateHandicap(List<double> diffs, bool applyMultiplier)
+        {
+            double sum = 0;
+            foreach (var d in diffs) sum += d;
+            double average = sum / diffs.Count;
+            return applyMultiplier ? average * 0.96 : average;
+        }
+    }
+
+    // without excellency pattern
+    public class RawHandicapStrategy : IHandicapStrategy
+    {
+        public double ComputeHandicap(List<double> scores, List<double> slopes, List<double> ratings)
+        {
+            if (scores == null || slopes == null || ratings == null)
+                throw new ArgumentNullException("Input lists cannot be null.");
+
+            var diffs = new List<double>();
+            for (int i = 0; i < scores.Count; i++)
             {
-                Console.WriteLine(topEight[i]);
+                double diff = (scores[i] - ratings[i]) * (113.0 / slopes[i]);
+                diffs.Add(diff);
             }
-
-            handicap = CalculateHandicap(topEight);
-            Console.WriteLine($"Your handicap based on your last 20 rounds: {handicap}");
-
-            return 0; 
+            diffs.Sort();
+            var topEight = diffs.GetRange(0, Math.Min(8, diffs.Count));
+            return topEight.Sum() / topEight.Count;
         }
+    }
 
-        public static List<double> InsertDifferential(List<double> topEight, double thisDifferential)
+    // 3. Use strategy
+    public class HandicapContext
+    {
+        private readonly IHandicapStrategy _strategy;
+
+        public HandicapContext(IHandicapStrategy strategy)
         {
-            int insertIdx = topEight.BinarySearch(thisDifferential);
-            if (insertIdx < 0) 
-                insertIdx = ~insertIdx;      // ~ gives the bitwise complement → correct insertion point
-                
-            topEight.Insert(insertIdx, thisDifferential);
-            topEight.RemoveAt(8);
-            return topEight;
+            _strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         }
 
-        public static double CalculateDifferential(double score, double slope, double rating)
-    {
-        double differential;
-        differential = ((score - rating) * (113 / slope));
-        return differential;
-    }
-
-    private static double CalculateHandicap(List<double> diffs)
-    {
-        double total = 0;
-        for (int i = 0; i < diffs.Count; i++)
+        public void Execute(List<double> scores, List<double> slopes, List<double> ratings)
         {
-            total += diffs[i];
+            double handicap = _strategy.ComputeHandicap(scores, slopes, ratings);
+            Console.WriteLine($"Your handicap based on your last {scores.Count} rounds: {handicap:F1}");
         }
-
-        double handicap = ((total / 8) * .96);
-        return handicap;
     }
 
-    public static void Main(string[] args)
+    // 4. Example usage
+    class Program
     {
-        // define your 20-round data
-        var scores = new List<double>
-        { 72, 73, 73, 74, 74, 74, 75, 76, 77, 79,
-            80, 81, 81, 81, 82, 83, 83, 84, 85, 86 };
-        var slopes = new List<double>
-        { 113, 123, 119, 110, 134, 123, 112, 132, 133, 123,
-            142, 123, 130, 128, 120, 121, 114, 132, 154, 123 };
-        var ratings = new List<double>
-        { 72, 71, 72, 72, 71, 72, 73, 71, 71, 72,
-            70, 71, 72, 73, 72, 71, 71, 72, 72, 72 };
+        static void Main(string[] args)
+        {
+            var scores = new List<double> { 72, 73, 73, 74, 74, 74, 75, 76, 77, 79,
+                                            80, 81, 81, 81, 82, 83, 83, 84, 85, 86 };
+            var slopes = new List<double> { 113, 123, 119, 110, 134, 123, 112, 132, 133, 123,
+                                            142, 123, 130, 128, 120, 121, 114, 132, 154, 123 };
+            var ratings = new List<double> { 72, 71, 72, 72, 71, 72, 73, 71, 71, 72,
+                                             70, 71, 72, 73, 72, 71, 71, 72, 72, 72 };
 
-    
-        HandicapCalc(scores, slopes, ratings);
+            // Strategy with USGA adjustment
+            Console.WriteLine("-- USGA Handicap (0.96 multiplier) --");
+            var usgaContext = new HandicapContext(new UsgaHandicapStrategy());
+            usgaContext.Execute(scores, slopes, ratings);
+
+            // Strategy without adjustment
+            Console.WriteLine("-- Raw Handicap (no multiplier) --");
+            var rawContext = new HandicapContext(new RawHandicapStrategy());
+            rawContext.Execute(scores, slopes, ratings);
+        }
     }
-    
-    }  
-
-}  
+}

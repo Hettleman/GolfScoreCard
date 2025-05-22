@@ -1,16 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 namespace GolfScoreCard
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext //Class for establishing connection to database and mapping User and Score classes
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Score> Scores { get; set; }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) //Constructor for establishing connection to database
         {
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder) //Method for configuring the database
         {
             base.OnModelCreating(modelBuilder);
 
@@ -37,8 +37,7 @@ namespace GolfScoreCard
                 .Property(u => u.handicap)
                 .HasColumnType("decimal(4,2)") // this makes sure EF maps it precisely to decimal(4,2)
                 .IsRequired();
-
-            // Score entity configuration
+            
             modelBuilder.Entity<Score>()
                 .HasKey(s => s.scoreId);
 
@@ -64,12 +63,12 @@ namespace GolfScoreCard
                 .Property(s => s.dateTime)
                 .IsRequired();
 
-            // Foreign Key relationship: Score.username -> User.username
+            // Foreign Key relationship
             modelBuilder.Entity<Score>()
                 .HasOne(s => s.User)
                 .WithMany()
                 .HasForeignKey(s => s.username)
-                .OnDelete(DeleteBehavior.Cascade); // optional but recommended to match SQL ON DELETE CASCADE
+                .OnDelete(DeleteBehavior.Cascade); // Cascade delete if user is deleted
         }
     }
 }

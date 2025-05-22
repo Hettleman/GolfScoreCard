@@ -10,12 +10,12 @@ namespace GolfScoreCard.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController : ControllerBase //controller class for talking to the API
     {
         private readonly AppDbContext _context;
         public UsersController(AppDbContext context) => _context = context;
 
-        [HttpPost]
+        [HttpPost] // POST method for creating a new user
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
             if (string.IsNullOrWhiteSpace(user.username)
@@ -39,51 +39,51 @@ namespace GolfScoreCard.Controllers
 
             user.passwordHash = BCrypt.Net.BCrypt.HashPassword(user.passwordHash);
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); //save changes to database
 
             return Ok("User created successfully.");
         }
 
-        [HttpDelete("{username}")]
+        [HttpDelete("{username}")] // DELETE method for deleting a user by username
         public async Task<IActionResult> DeleteUser(string username)
         {
-            var user = await _context.Users.FindAsync(username);
-            if (user == null) return NotFound("User not found.");
+            var user = await _context.Users.FindAsync(username); //find user by username
+            if (user == null) return NotFound("User not found."); //verify user exists
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            _context.Users.Remove(user); //remove user from database
+            await _context.SaveChangesAsync(); //save changes to database
             return Ok("User deleted successfully.");
         }
 
-        [HttpPost("login")]
+        [HttpPost("login")] // POST method for logging in a user
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (string.IsNullOrWhiteSpace(loginRequest.Username)
+            if (string.IsNullOrWhiteSpace(loginRequest.Username) //verify username and password are not null
              || string.IsNullOrWhiteSpace(loginRequest.Password))
-                return BadRequest("Username and password are required.");
+                return BadRequest("Username and password are required."); 
 
             var user = await _context.Users.FindAsync(loginRequest.Username);
             if (user == null
-             || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.passwordHash))
-                return Unauthorized("Invalid username or password.");
+             || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.passwordHash)) //compares hashes to verify password
+                return Unauthorized("Invalid username or password."); 
 
             return Ok("Login successful.");
         }
         
-        [HttpPut("{username}/handicap")]
+        [HttpPut("{username}/handicap")] // PUT method for updating a user's handicap'
         public async Task<IActionResult> UpdateHandicap(string username, [FromBody] decimal newHandicap)
         {
-            var user = await _context.Users.FindAsync(username);
-            if (user == null)
+            var user = await _context.Users.FindAsync(username); //find user by username
+            if (user == null) //verify user exists
                 return NotFound(new { message = "User not found." });
             
             var oldHandicap = user.handicap;
             user.handicap = newHandicap;
             
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); //save changes to database
             
-            var observer = new HandicapObserver();
-            observer.HandicapChange(user, oldHandicap, newHandicap);
+            var observer = new HandicapObserver(); //create observer instance
+            observer.HandicapChange(user, oldHandicap, newHandicap); //notify observer of change
             
             return Ok(new
             {
@@ -95,7 +95,7 @@ namespace GolfScoreCard.Controllers
         }
     }
 
-    public class LoginRequest
+    public class LoginRequest //login request class 
     {
         public string Username { get; set; }
         public string Password { get; set; }

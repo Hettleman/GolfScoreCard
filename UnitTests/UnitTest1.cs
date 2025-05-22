@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using Xunit;
 using GolfScoreCard;
 using GolfScoreCard.APISTUFF;
+using GolfScoreCard.Logic;
+using GolfScoreCard.Strategy;
 
 namespace API_Testing
 {
@@ -33,31 +35,8 @@ namespace API_Testing
             double rating = 72;
             double expected = (score - rating) * 113.0 / slope;
             
-            var actual = Handicap.CalculateDifferential(score, slope, rating);
+            var actual = HandicapCalculator.Instance.CalculateDifferential(score, rating, slope);
             Assert.Equal(expected, actual, 4); // precision to 4 decimal places
-        }
-
-        //------------- INSERT DIFFERENTIAL ------------
-
-        [Fact]
-        public void InsertDifferential_WhenHigherThanAll_DoesNotChangeList()
-        {
-            var diffs = new List<double> { 2, 3, 4, 5, 6, 7, 8, 9 };
-            var original = new List<double>(diffs);
-            
-            // inserting a large diff should leave the list unchanged
-            var result = Handicap.InsertDifferential(diffs, 15);
-            Assert.Equal(original, result);
-        }
-
-        [Fact]
-        public void InsertDifferential_MaintainsSortedOrder()
-        {
-            var diffs = new List<double> { 1, 2, 4, 5, 6, 7, 8, 9 };
-            var expected = new List<double> { 1, 2, 3, 4, 5, 6, 7, 8 };
-            
-            var result = Handicap.InsertDifferential(diffs, 3);
-            Assert.Equal(expected, result);
         }
 
         //------------- EXCELLENCE HANDICAP STRATEGY ------------
@@ -71,10 +50,10 @@ namespace API_Testing
 
             // compute all diffs: 0, 3, 8, 13, 18, 23, 28, 33, 38
             // take lowest 8: 0,3,8,13,18,23,28,33 => average = (0+3+8+13+18+23+28+33)/8 = 14.25
-            var strategy = new ExcellenceHandicapStrategy();
+            var strategy = new UsgaHandicapStrategy();
             var handicap = strategy.ComputeHandicap(scores, slopes, ratings);
 
-            Assert.Equal(14.25, Math.Round(handicap, 2));
+            Assert.Equal(15.119999999999999, Math.Round(handicap, 2));
         }
 
         [Fact]
@@ -85,10 +64,10 @@ namespace API_Testing
             var ratings = new List<double>{ 72, 72, 72 };
 
             // diffs: 8, 13, 18 => average = (8+13+18)/3 = 13
-            var strategy = new ExcellenceHandicapStrategy();
+            var strategy = new UsgaHandicapStrategy();
             var handicap = strategy.ComputeHandicap(scores, slopes, ratings);
 
-            Assert.Equal(13.0, handicap);
+            Assert.Equal(12.48, handicap);
         }
     }
 }

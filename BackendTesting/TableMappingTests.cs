@@ -1,7 +1,4 @@
-using System;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Xunit;
 namespace BackendTesting;
 using GolfScoreCard;
 
@@ -113,15 +110,13 @@ public class AppDbContextTests
 
             context.Scores.Add(score);
             context.SaveChanges();
-
-                // Delete user
+            
             context.Users.Remove(user);
             context.SaveChanges();
         }
 
         using (var context = new AppDbContext(options))
         {
-            // Score should be gone
             var scores = context.Scores.ToList();
             Assert.Empty(scores);
         }
